@@ -240,7 +240,7 @@ def save_answer(request, assesment_id, question_id):
                 answer.status = Answer.Status.UA
 
             # Reviewed
-            elif answer_form.cleaned_data["reviewed"]:
+            elif "reviewed" in request.POST:
                 answer.status = Answer.Status.RV
 
             # Answered

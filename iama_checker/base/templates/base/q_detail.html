@@ -67,23 +67,10 @@
                         <textarea class="form-control rounded px-1" name="answer_content" rows="15" style="background-color: #E8E8E8" placeholder="Vul hier uw antwoord in"></textarea>
                     {% endif %}
                     <div class="row mb-2">
-                        <div class="col-md-3"></div>
-                        <div class="col-md-3 d-flex justify-content-center align-items-center">
-                            <div class="form-check align-items-center">
-                                <label class="form-check-label" for="reviewed"> Reviewed en Compleet
-                                {% if answer.status|is_reviewed %}
-                                    <input class="form-check-input" id="reviewed" name="reviewed" type="checkbox" value="reviewed" checked>
-                                {% else %}
-                                    <input class="form-check-input" id="reviewed" name="reviewed" type="checkbox" value="reviewed">
-                                {% endif %}
-                                <span class="form-check-sign">
-                                    <span class="check"></span>
-                                </span>
-                                </label>
-                            </div>
+                        <div class="d-flex justify-content-around">
+                            <button type="submit" name="save_answer" class="btn btn-primary">Concept antwoord opslaan</button>
+                            <button type="submit" name="reviewed" class="btn btn-primary">Definitief antwoord opslaan</button>
                         </div>
-                        <div class="col-md-3"><button type="submit" name="save_answer" class="btn btn-primary">Save/Update Antwoord</button></div>
-                        <div class="col-md-3"></div>
                     </div>
                     <div class="text-center">
                         <button class="btn btn-secundary" style="padding-left:5em;padding-right:5em;" type="button" data-bs-toggle="collapse" data-bs-target="#question_context">Klik hier voor vraag context en uitleg</button>
