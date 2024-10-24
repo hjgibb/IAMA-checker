@@ -233,7 +233,8 @@ def save_answer(request, assesment_id, question_id):
                 # Update answer data
                 answer.answer_content = answer_form.data["answer_content"].strip()# is_valid drops answer content from cleaned data?????
             
-            #TODO: implement error for definitively saving empty answer:elif "reviewed" in request.POST and answer_form.data["answer_content"].strip() == "":
+            #TODO: implement error for definitively saving empty answer:
+            #elif "reviewed" in request.POST and answer_form.data["answer_content"].strip() == "":
 
             # Check the state of the question
 
