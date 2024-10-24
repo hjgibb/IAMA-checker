@@ -58,6 +58,9 @@
             <div class="card-body">
                 <form action="{% url 'base:save_answer' assesment.id question.id %}" method="post">
                     {% csrf_token %}
+                    {% if error %}
+                        <span class="text-danger">{{ error }}</span>
+                    {% endif %}
                     <center>
                         <p><h4 style="color: black"><i>{{ question.question_text|safe }}</i></h4></p>
                     </center>
@@ -67,7 +70,8 @@
                         <textarea class="form-control rounded px-1" name="answer_content" rows="15" style="background-color: #E8E8E8" placeholder="Vul hier uw antwoord in"></textarea>
                     {% endif %}
                     <div class="row mb-2">
-                        <div class="d-flex justify-content-around">
+                        <div class="col-md-3"></div>
+                        <div class="col-md-3 justify-content-around">
                             <button type="submit" name="save_answer" class="btn btn-primary">Concept antwoord opslaan</button>
                             <button type="submit" name="reviewed" class="btn btn-primary">Definitief antwoord opslaan</button>
                         </div>

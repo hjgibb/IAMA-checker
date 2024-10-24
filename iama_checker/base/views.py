@@ -232,6 +232,11 @@ def save_answer(request, assesment_id, question_id):
 
                 # Update answer data
                 answer.answer_content = answer_form.data["answer_content"].strip()# is_valid drops answer content from cleaned data?????
+            elif "reviewed" in request.POST and answer_form.data["answer_content"].strip() == "":
+                #error = "Leeg antwoord kan niet definitief zijn."
+                request.session["error"] = "Leeg antwoord kan geen definitief antwoord zijn."
+                #return render(request, "base/q_detail.html", {"assesment_id": assesment_id, "question_id": question_id, "error": error})
+                return HttpResponseRedirect(reverse("base:question_detail", kwargs={"assesment_id": assesment_id, "question_id": question_id}), {"error": "Leeg antwoord kan geen definitief antwoord zijn."})
 
             # Check the state of the question
 
