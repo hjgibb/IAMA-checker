@@ -232,6 +232,9 @@ def save_answer(request, assesment_id, question_id):
 
                 # Update answer data
                 answer.answer_content = answer_form.data["answer_content"].strip()# is_valid drops answer content from cleaned data?????
+            
+            #TODO: implement error for definitively saving empty answer:
+            #elif "reviewed" in request.POST and answer_form.data["answer_content"].strip() == "":
 
             # Check the state of the question
 
@@ -240,7 +243,7 @@ def save_answer(request, assesment_id, question_id):
                 answer.status = Answer.Status.UA
 
             # Reviewed
-            elif answer_form.cleaned_data["reviewed"]:
+            elif "reviewed" in request.POST:
                 answer.status = Answer.Status.RV
 
             # Answered

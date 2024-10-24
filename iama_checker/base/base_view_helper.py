@@ -90,16 +90,16 @@ def get_complete_status(request, assesment):
             # Have the html stored in a string-variable to reduce html clutter in the question_index.html file
             match answer.status:
                 case Answer.Status.UA:
-                    status = "<span class='badge badge-danger badge-pill'>Onbeantwoord</span>"
+                    status = "<span class='badge badge-danger badge-pill'>Nog beantwoorden</span>"
                 
                 case Answer.Status.AW:
-                    status = "<span class='badge badge-warning badge-pill'>Beantwoord</span>"
+                    status = "<span class='badge badge-warning badge-pill'>Concept</span>"
 
                 case Answer.Status.RV:
-                    status = "<span class='badge badge-success badge-pill'>Reviewed</span>"
+                    status = "<span class='badge badge-success badge-pill'>Definitief</span>"
         # Answers are created when the related question_page is first visited so, missing object also means unanswered 
         except (KeyError, Answer.DoesNotExist):
-            status = "<span class='badge badge-danger badge-pill'>Onbeantwoord</span>"
+            status = "<span class='badge badge-danger badge-pill'>Nog beantwoorden</span>"
         # Append dict
         status_list[str(question.id)] = status
 
