@@ -3,11 +3,11 @@
 {% load base_extra %}
 
 {% block navigation %}
-  <a href="{% url 'base:detail' assesment.id %}" style="color:grey">IAMA-Assesment - {{ assesment.name }}; Grondrecht - {{ law.name}}</a>
+  <a href="{% url 'base:detail' assessment.id %}" style="color:grey">IAMA-Assessment - {{ assessment.name }}; Grondrecht - {{ law.name}}</a>
 {% endblock %}
 
 {% block add_editor %}
-<a href="{% url 'base:search_editor' assesment.id %}?next={{ request.path }}" class="btn btn-info btn-round">Voeg editor toe aan assemsent +</a>
+<a href="{% url 'base:search_editor' assessment.id %}?next={{ request.path }}" class="btn btn-info btn-round">Voeg editor toe aan assessment +</a>
 {% endblock %}
 
 {% block content %}
@@ -40,7 +40,7 @@
 </div>
 <div class="row">
     <div class="col-md-2" style="padding: 0;">
-        {% include 'base/collaborators.html' with collab_list=collab_list assesment_id=assesment.id question_id=question.id answer_id=answer.id collab_options=collab_options %}
+        {% include 'base/collaborators.html' with collab_list=collab_list assessment_id=assessment.id question_id=question.id answer_id=answer.id collab_options=collab_options %}
     </div>
     <div class="col">
         <div class="card">
@@ -148,7 +148,7 @@
         {% include 'includes/reference_list.html' with reference_list=reference_list %}
     </div>
     <div class="col-md-3">
-      {% include 'includes/law_index.html' with assesment=assesment current_question=question.id question_list=index_context_objects.question_list status_list=index_context_objects.status_list law=law %}
+      {% include 'includes/law_index.html' with assessment=assessment current_question=question.id question_list=index_context_objects.question_list status_list=index_context_objects.status_list law=law %}
     </div>
 </div>
 {% endblock %}
