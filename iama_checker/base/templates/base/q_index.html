@@ -36,7 +36,7 @@
                 {% endif %}
             {% endif %}
         {% endfor %}
-    {% else %}
+    {% elif assesments_list %}
         <p style="font-size: 17px; margin-left: 0.75em; margin-top: 0.25em"><b>Jouw Assessments:</b></p>
         {% for item in assesments_list %}
             <a href="{% url 'base:detail' item.id %}" class="list-group-item list-group-item-light list-group-item-action">
