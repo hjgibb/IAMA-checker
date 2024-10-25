@@ -2,6 +2,15 @@
 
 <div class="list-group rounded border">
     {% if assesment %}
+        {% if question %}
+            <a href="{% url 'base:detail' assesment.id %}" class="list-group-item list-group-item-action list-group-item-dark">
+                Assessment overzicht
+            </a>
+        {% else %}
+        <a href="{% url 'base:home' %}" class="list-group-item list-group-item-action list-group-item-dark">
+            Dashboard assessments
+        </a>
+        {% endif %}
         {% for question in question_list %}
             {% if question.question_number == 0 %}
                 {% if current_question == question.id %}
@@ -28,6 +37,7 @@
             {% endif %}
         {% endfor %}
     {% else %}
+        <p style="font-size: 17px; margin-left: 0.75em; margin-top: 0.25em"><b>Jouw Assessments:</b></p>
         {% for item in assesments_list %}
             <a href="{% url 'base:detail' item.id %}" class="list-group-item list-group-item-light list-group-item-action">
                 {{ item.name }}
