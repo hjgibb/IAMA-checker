@@ -2,10 +2,10 @@
 {% load base_extra %}
 
 <div class="list-group rounded border" style="border-width:3px !important">
-    <a href="{% url 'base:detail' assesment.id %}" class="list-group-item list-group-item-action list-group-item-dark">
-        Terug naar assesment overzicht
+    <a href="{% url 'base:detail' assessment.id %}" class="list-group-item list-group-item-action list-group-item-dark">
+        Terug naar assessment overzicht
     </a>
-    <a href="{% url 'base:question_detail' assesment.id 10 %}" class="list-group-item list-group-item-action border">
+    <a href="{% url 'base:question_detail' assessment.id 10 %}" class="list-group-item list-group-item-action border">
         Terug naar wetten overzicht 
     </a>
     {% for question in question_list %}
