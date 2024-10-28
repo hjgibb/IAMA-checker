@@ -360,8 +360,8 @@ def delete_collab(request, answer_id, collab_id):
 
 @login_required
 def info(request):
-    assesments_list = Assesment.objects.filter(user__pk=request.user.pk).order_by("-date_last_saved")
-    return render(request, "base/info.html" ,{"assesments_list": assesments_list}) 
+    assessments_list = Assessment.objects.filter(user__pk=request.user.pk).order_by("-date_last_saved")
+    return render(request, "base/info.html" ,{"assessments_list": assessments_list}) 
 
 @login_required
 def add_editor(request, assessment_id, editor_id):
@@ -455,8 +455,8 @@ def delete_editor(request, assessment_id, editor_id):
 
 @login_required
 def landing_page(request):
-    assesments_list = Assesment.objects.filter(user__pk=request.user.pk).order_by("-date_last_saved")
-    return render(request, "base/landing_page.html", {"assesments_list": assesments_list})
+    assessments_list = Assessment.objects.filter(user__pk=request.user.pk).order_by("-date_last_saved")
+    return render(request, "base/landing_page.html", {"assessments_list": assessments_list})
 
 @login_required
 def create_law(request, assessment_id):
