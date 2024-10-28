@@ -1,28 +1,28 @@
 # File with the helpler functions for the base views
-from .models import Assesment, Phase4Answer, Question, Answer, Law
+from .models import Assessment, Phase4Answer, Question, Answer, Law
 
-def get_answers_sorted(assesment, question):
-    return_list = Answer.objects.filter(assesment_id=assesment, question_id=question).order_by("-created")
+def get_answers_sorted(assessment, question):
+    return_list = Answer.objects.filter(assessment_id=assessment, question_id=question).order_by("-created")
     
     # Eliminate the answers with empty answer bodies
     return [answer for answer in return_list if answer.answer_content != ""]
 
-# Check if the logged in user is the authorised to edit and view the assesment_is 
+# Check if the logged in user is the authorised to edit and view the assessment_is 
 # Return True if authorised, else False
-def user_has_edit_privilidge(user_id, assesment):
+def user_has_edit_privilidge(user_id, assessment):
     # Check if authorised
-    return (assesment.user.id == user_id) or (assesment.user_group.filter(id = user_id).exists())
+    return (assessment.user.id == user_id) or (assessment.user_group.filter(id = user_id).exists())
 
 # Return true if all answers have the reviewed status
-def all_answers_reviewed(assesment_id):
+def all_answers_reviewed(assessment_id):
     # Loop through all questions
     for question in Question.objects.exclude(question_phase=5):
         # Make sure to only check questions and not phase intros, then check only if the latest element is not reviewed
-        if question.question_number != 0 and Answer.objects.filter(assesment_id=assesment_id, question_id=question).latest("created").status != Answer.Status.RV:
+        if question.question_number != 0 and Answer.objects.filter(assessment_id=assessment_id, question_id=question).latest("created").status != Answer.Status.RV:
             return False
 
     # Check if laws are completed
-    for law in Law.objects.filter(assesment_id=assesment_id):
+    for law in Law.objects.filter(assessment_id=assessment_id):
         if law.status == Law.Status.ICP:
             return False
     # All answer have reviewed status
@@ -42,28 +42,28 @@ def jobs_per_phase(phase_num):
             jobs.append(job)
     return jobs
 
-# Generates emtpy answers for all of questions in the assesment
-def generate_empty_answers(assesment, user):
+# Generates emtpy answers for all of questions in the assessment
+def generate_empty_answers(assessment, user):
     # Go through all the questions
     for question in Question.objects.exclude(question_phase=5):
         # Only create answers for question and not phase introductions 
         if question.question_number != 0:
             # Create an empty answer and store it in the db
-            answer = Answer(assesment_id=assesment, question_id=question, user=user, status=Answer.Status.UA)
+            answer = Answer(assessment_id=assessment, question_id=question, user=user, status=Answer.Status.UA)
             answer.save()
 
 # Generate empty answers for a law in phase phase 4
 def generate_empty_law_answers(law):
     for question in Question.objects.filter(question_phase=5):
         if question.question_number != 0:
-            answer = Phase4Answer(law=law, assesment_id=law.assesment, question_id=question, user=law.assesment.user, status=Answer.Status.UA) 
+            answer = Phase4Answer(law=law, assessment_id=law.assessment, question_id=question, user=law.assessment.user, status=Answer.Status.UA) 
             answer.save()
 
 # Retrieve a list of options to add as possible collaborators to an answer
-def get_collab_options(assesment, curr_answer):
+def get_collab_options(assessment, curr_answer):
     return_collab = []
-    # Get all the answers associated with the assesment
-    answers = Answer.objects.filter(assesment_id=assesment.pk)
+    # Get all the answers associated with the assessment
+    answers = Answer.objects.filter(assessment_id=assessment.pk)
     exclude = curr_answer.collaborator_set.all()
 
     # Get all the collaborators
@@ -76,15 +76,15 @@ def get_collab_options(assesment, curr_answer):
 
     return return_collab
 
-# Retrieves the completion status as html of every answer related to an assesment
+# Retrieves the completion status as html of every answer related to an assessment
 # and puts them in a dictionary that is returned
-def get_complete_status(request, assesment):
+def get_complete_status(request, assessment):
     question_list = Question.objects.exclude(question_phase=5)
     status_list = {}
     for question in question_list:
         try:
-            # Match an answer based on question_id, user_id and assesment_id
-            answer = Answer.objects.filter(question_id=question.pk, assesment_id=assesment.id).latest("created")
+            # Match an answer based on question_id, user_id and assessment_id
+            answer = Answer.objects.filter(question_id=question.pk, assessment_id=assessment.id).latest("created")
             status = ""
 
             # Have the html stored in a string-variable to reduce html clutter in the question_index.html file
@@ -110,19 +110,19 @@ def is_law_complete(law):
     # Loop through all questions of phase 4, remember that the question are have 
     for question in Question.objects.filter(question_phase=5):
         # Make sure to only check questions and not phase intros, then check only if the latest element is not reviewed
-        if question.question_number != 0 and Phase4Answer.objects.filter(law=law, assesment_id=law.assesment, question_id=question).latest("created").status != Answer.Status.RV:
+        if question.question_number != 0 and Phase4Answer.objects.filter(law=law, assessment_id=law.assessment, question_id=question).latest("created").status != Answer.Status.RV:
             return Law.Status.ICP
     # All answer have reviewed status
     return Law.Status.CP
 
 # Get the completion status of all the questions for a given law
-def get_law_complete_status(request, assesment):
+def get_law_complete_status(request, assessment):
     questions = Question.objects.filter(question_phase=5)
     status_list = {}
     for question in questions:
         try:
-            # Match an answer based on question_id, user_id and assesment_id
-            answer = Phase4Answer.objects.filter(question_id=question, assesment_id=assesment).latest("created")
+            # Match an answer based on question_id, user_id and assessment_id
+            answer = Phase4Answer.objects.filter(question_id=question, assessment_id=assessment).latest("created")
 
             # Have the html stored in a string-variable to reduce html clutter in the question_index.html file
             match answer.status:

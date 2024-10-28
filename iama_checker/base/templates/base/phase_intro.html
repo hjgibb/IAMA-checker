@@ -1,11 +1,11 @@
 {% extends 'base/base.html' %}
 
 {% block navigation %}
-<a href="{% url 'base:detail' assesment.id %}" style="color: black"><b>IAMA-Assesment - {{ assesment.name }}</b></a>
+<a href="{% url 'base:detail' assessment.id %}" style="color: black"><b>IAMA-Assessment - {{ assessment.name }}</b></a>
 {% endblock %}
 
 {% block add_editor %}
-    <a href="{% url 'base:search_editor' assesment.id %}?next={{ request.path }}" style="justify-content-end" class="btn btn-primary btn-round btn-info">Voeg editor toe aan assesment +</a>
+    <a href="{% url 'base:search_editor' assessment.id %}?next={{ request.path }}" style="justify-content-end" class="btn btn-primary btn-round btn-info">Voeg editor toe aan assessment +</a>
 {% endblock %}
 
 {% block content %}
@@ -65,10 +65,10 @@
         <div class="row">
           <div class="col text-center">
             {% if question.id != 1 %}
-                <a href="{% url 'base:question_detail' assesment.id buttons.prev %}" class="btn btn-primary btn-round">Vorige</a>
+                <a href="{% url 'base:question_detail' assessment.id buttons.prev %}" class="btn btn-primary btn-round">Vorige</a>
             {% endif %}
             {% if question.id != 10 %}
-                <a href="{% url 'base:question_detail' assesment.id buttons.next %}" class="btn btn-primary btn-round">Volgende</a>
+                <a href="{% url 'base:question_detail' assessment.id buttons.next %}" class="btn btn-primary btn-round">Volgende</a>
             {% endif %}
           </div>
         </div>
