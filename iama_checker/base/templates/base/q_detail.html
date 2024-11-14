@@ -55,6 +55,7 @@
         <div class="card">
             <div class="card-header card-header-primary">
                 <h4 class="card-title"> {{ question.question_title }} </h4>
+                <!--<h4 class="card-title"> {{ question.question_text|safe }}</h4>-->
             </div>
             <div class="card-body">
                 <form action="{% url 'base:save_answer' assessment.id question.id %}" method="post">
