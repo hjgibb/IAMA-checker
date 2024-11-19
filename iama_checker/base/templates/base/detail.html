@@ -64,9 +64,6 @@
             </div>
         </div>
       <div class="row justify-content-center">
-          {% include "base/tutorial.html" %}
-      </div>
-      <div class="row justify-content-center">
           <div class="col d-flex justify-content-center">
               <a href="{% url 'base:question_detail' assessment.id 1 %}" class="btn btn-primary btn-round px-5">Start Assessment!</a>
           </div>
@@ -77,6 +74,9 @@
           </div>
       </div>
     </div>
+      <div class="row justify-content-center">
+          {% include "base/tutorial.html" %}
+      </div>
 </div>
 
 {% endblock %}
