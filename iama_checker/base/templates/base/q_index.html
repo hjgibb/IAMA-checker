@@ -1,15 +1,14 @@
 {% load base_extra %}
 
 <div class="list-group rounded border">
+    <a href="{% url 'base:home' %}" style="margin: 0.5em;">
+        <b>Alle Assessments</b> <i class="material-icons" style="color:purple;" >list</i>
+    </a>
     {% if assessment %}
         {% if question %}
             <a href="{% url 'base:detail' assessment.id %}" class="list-group-item list-group-item-action list-group-item-dark">
                 Assessment overzicht
             </a>
-        {% else %}
-        <a href="{% url 'base:home' %}" style="margin: 0.5em;">
-            <b>Alle Assessments</b> <i class="material-icons" style="color:purple;" >list</i>
-        </a>
         {% endif %}
         {% for question in question_list %}
             {% if question.question_number == 0 %}
@@ -37,9 +36,6 @@
             {% endif %}
         {% endfor %}
     {% elif assessments_list %}
-        <a href="{% url 'base:home' %}" style="margin: 0.5em;">
-            <b>Alle Assessments</b> <i class="material-icons" style="color:purple;" >list</i>
-        </a>
         {% for item in assessments_list %}
             <a href="{% url 'base:detail' item.id %}" class="list-group-item list-group-item-light list-group-item-action">
                 {{ item.name }}
