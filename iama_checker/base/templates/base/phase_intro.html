@@ -1,7 +1,7 @@
 {% extends 'base/base.html' %}
 
 {% block navigation %}
-<a href="{% url 'base:detail' assessment.id %}" style="color: grey">IAMA-Assessment - {{ assessment.name }}</a>
+<a href="{% url 'base:detail' assessment.id %}" style="color: black"><b>IAMA-Assessment - {{ assessment.name }}</b></a>
 {% endblock %}
 
 {% block add_editor %}
@@ -17,7 +17,7 @@
     <div class="col"></div>
 </div>
 <div class="row">
-    <div class="col-md-8 offset-md-1">
+    <div class="col">
         <div class="card" style="margin-bottom: 4em">
             <div class="card-header card-header-primary">
                 <h4 class="card-title">
@@ -73,8 +73,5 @@
           </div>
         </div>
       </div>
-    <div class="col-md-3" style="padding-top: 30px">
-        {% include "base/q_index.html" with assessment=assessment question_list=index_context_objects.question_list current_question=question.id status_list=index_context_objects.status_list %}
-    </div>
 </div>
 {% endblock %}

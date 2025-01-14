@@ -3,7 +3,7 @@
 {% load base_extra %}
 
 {% block navigation %}
-  <a href="{% url 'base:detail' assessment.id %}" style="color:grey">IAMA-Assessment - {{ assessment.name }}; Grondrecht - {{ law.name}}</a>
+  <a href="{% url 'base:detail' assessment.id %}" style="color:black"><b>IAMA-Assessment - {{ assessment.name }}; Grondrecht - {{ law.name}}</b></a>
 {% endblock %}
 
 {% block add_editor %}

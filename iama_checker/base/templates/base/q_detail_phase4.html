@@ -3,7 +3,7 @@
 {% load base_extra %}
 
 {% block navigation %}
-  <a href="{% url 'base:detail' assessment.id %}" style="color:grey">IAMA-Assessment - {{ assessment.name }}</a>
+  <a href="{% url 'base:detail' assessment.id %}" style="color:black"><b>IAMA-Assessment - {{ assessment.name }}</b></a>
 {% endblock %}
 
 {% block add_editor %}
@@ -76,9 +76,6 @@
           </div>
         </div>
         {% include 'includes/reference_list.html' with reference_list=reference_list %}
-    </div>
-    <div class="col-md-3">
-        {% include 'base/q_index.html' with assessment=assessment question_list=index_context_objects.question_list current_question=question.id status_list=index_context_objects.status_list %}
     </div>
 </div>
 {% endblock %}

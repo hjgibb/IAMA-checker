@@ -1,7 +1,7 @@
 {% extends "base/base.html" %}
 
 {% block navigation %}
-IAMA-Assessment - Overzicht {{ assessment.name}} 
+<b>IAMA-Assessment - Overzicht {{ assessment.name}} </b>
 {% endblock %}
 
 {% block add_editor %}
@@ -76,9 +76,6 @@ IAMA-Assessment - Overzicht {{ assessment.name}}
               {% include "includes/editor_list.html" with editor_list=index_context_objects.editor_list %}
           </div>
       </div>
-    </div>
-    <div class="col-md-3">
-        {% include "base/q_index.html" with assessment=assessment question_list=index_context_objects.question_list current_question=question.id status_list=index_context_objects.status_list %}
     </div>
 </div>
 
