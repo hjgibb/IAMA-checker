@@ -14,13 +14,6 @@
 {% endblock %}
 
 {% block content %}
-<!--<div class="row">
-    <div class="col-md-2">
-    <button class="btn btn-primary btn-round dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-        Beheer medewerkers
-      </button>
-    </div>
-</div>-->
 <div class="row">
     <div class="col-md-2"></div>
     <div class="col-md-9 text-center">
@@ -44,7 +37,6 @@
   </div>
 </div>
 <div class="row">
-    <!--remove medewerkers column here!-->
     <div class="col-md-2" style="padding: 0;">
         {% include 'base/collaborators.html' with collab_list=collab_list assessment_id=assessment.id question_id=question.id answer_id=answer.id collab_options=collab_options %}
     </div>
@@ -59,9 +51,6 @@
             <div class="card-body">
                 <form action="{% url 'base:save_answer' assessment.id question.id %}" method="post">
                     {% csrf_token %}
-                    <!--{% if error %}
-                        <span class="text-danger">{{ error }}</span>
-                    {% endif %}-->
                     {% if answer.answer_content %}
                         <textarea class="form-control rounded px-1" name="answer_content" rows="15" style="background-color: #E8E8E8" placeholder="Vul hier uw antwoord in"> {{ answer.answer_content }} </textarea>
                     {% else %}

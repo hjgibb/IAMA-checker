@@ -164,10 +164,6 @@ def question_detail(request, assessment_id, question_id):
     
     # Render question_detail page
     else:
-        # Make sure the questions of phase 5 are not rendered using with this template and context
-        if question.question_phase == 5:
-            return render(request, "errors/error.html", {"message": "Deze vraag bestaat niet zonder bijbehorend grondrecht!"})
-
         context = {
             "assessment": assessment, 
             "question": question, 

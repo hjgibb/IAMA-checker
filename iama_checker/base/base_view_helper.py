@@ -16,7 +16,7 @@ def user_has_edit_privilidge(user_id, assessment):
 # Return true if all answers have the reviewed status
 def all_answers_reviewed(assessment_id):
     # Loop through all questions
-    for question in Question.objects.exclude(question_phase=5):
+    for question in Question.objects.all():
         # Make sure to only check questions and not phase intros, then check only if the latest element is not reviewed
         if question.question_number != 0 and Answer.objects.filter(assessment_id=assessment_id, question_id=question).latest("created").status != Answer.Status.RV:
             return False
@@ -45,18 +45,11 @@ def jobs_per_phase(phase_num):
 # Generates emtpy answers for all of questions in the assessment
 def generate_empty_answers(assessment, user):
     # Go through all the questions
-    for question in Question.objects.exclude(question_phase=5):
+    for question in Question.objects.all():
         # Only create answers for question and not phase introductions 
         if question.question_number != 0:
             # Create an empty answer and store it in the db
             answer = Answer(assessment_id=assessment, question_id=question, user=user, status=Answer.Status.UA)
-            answer.save()
-
-# Generate empty answers for a law in phase phase 4
-def generate_empty_law_answers(law):
-    for question in Question.objects.filter(question_phase=5):
-        if question.question_number != 0:
-            answer = Phase4Answer(law=law, assessment_id=law.assessment, question_id=question, user=law.assessment.user, status=Answer.Status.UA) 
             answer.save()
 
 # Retrieve a list of options to add as possible collaborators to an answer
@@ -79,7 +72,7 @@ def get_collab_options(assessment, curr_answer):
 # Retrieves the completion status as html of every answer related to an assessment
 # and puts them in a dictionary that is returned
 def get_complete_status(request, assessment):
-    question_list = Question.objects.exclude(question_phase=5)
+    question_list = Question.objects.all()
     status_list = {}
     for question in question_list:
         try:
@@ -104,16 +97,6 @@ def get_complete_status(request, assessment):
         status_list[str(question.id)] = status
 
     return status_list
-
-# Return the law complete or incomplete status based on wether the phase 4 questions of that law were reviewed
-def is_law_complete(law):
-    # Loop through all questions of phase 4, remember that the question are have 
-    for question in Question.objects.filter(question_phase=5):
-        # Make sure to only check questions and not phase intros, then check only if the latest element is not reviewed
-        if question.question_number != 0 and Phase4Answer.objects.filter(law=law, assessment_id=law.assessment, question_id=question).latest("created").status != Answer.Status.RV:
-            return Law.Status.ICP
-    # All answer have reviewed status
-    return Law.Status.CP
 
 # Get the completion status of all the questions for a given law
 def get_law_complete_status(request, assessment):
