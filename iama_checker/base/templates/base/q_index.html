@@ -7,8 +7,8 @@
                 Assessment overzicht
             </a>
         {% else %}
-        <a href="{% url 'base:home' %}" class="list-group-item list-group-item-action list-group-item-dark">
-            Dashboard assessments
+        <a href="{% url 'base:home' %}" style="margin: 0.5em;">
+            <b>Alle Assessments</b> <i class="material-icons" style="color:purple;" >list</i>
         </a>
         {% endif %}
         {% for question in question_list %}
@@ -37,7 +37,9 @@
             {% endif %}
         {% endfor %}
     {% elif assessments_list %}
-        <p style="font-size: 17px; margin-left: 0.75em; margin-top: 0.25em"><b>Jouw Assessments:</b></p>
+        <a href="{% url 'base:home' %}" style="margin: 0.5em;">
+            <b>Alle Assessments</b> <i class="material-icons" style="color:purple;" >list</i>
+        </a>
         {% for item in assessments_list %}
             <a href="{% url 'base:detail' item.id %}" class="list-group-item list-group-item-light list-group-item-action">
                 {{ item.name }}

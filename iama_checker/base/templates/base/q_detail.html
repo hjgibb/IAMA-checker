@@ -6,16 +6,18 @@
   <a href="{% url 'base:detail' assessment.id %}" style="color:black"><b>IAMA-Assessment - {{ assessment.name }}</b></a>
 {% endblock %}
 
+
 {% block add_editor %}
+{% if question.question_number == 0 %}
 <a href="{% url 'base:search_editor' assessment.id %}?next={{ request.path }}" class="btn btn-info btn-round">Voeg editor toe aan assessment +</a>
+{% endif %}
 {% endblock %}
 
 {% block content %}
 <div class="row">
     <div class="col-md-2"></div>
-    <div class="col-md-7 text-center">
-        <h2 class="text-primary">Vraag {{ question.question_phase }}.{{ question.question_number.normalize }} </h2>
-        {% include "includes/question_history.html" with question=question question_history=question_history %}
+    <div class="col-md-9 text-center">
+        <h2 class="text-primary">Vraag {{ question.question_phase }}.{{ question.question_number.normalize }}: {{ question.question_title }} </h2>
     </div>
     <div class="col"></div>
 </div>
@@ -29,18 +31,6 @@
             {% include 'includes/law_clusters_appendix.html' with law_clusters=law_clusters %}
         </div>
     {% else %}
-    <div class="card">
-        <div class="card-body">
-        <h6 class="text-primary"><b>Betrokken beroepen:</b></h6>
-        {% for job in jobs %}
-            {% if job.priority == 1 %}
-                <span class="badge badge-danger" style="font-size: 13px">{{ job.description }}</span>
-            {% else %}
-                <span class="badge badge-warning" style="font-size: 13px">{{ job.description }}</span>
-            {% endif %}
-        {% endfor %}
-      </div>
-    </div>
     {% endif %}
   </div>
   <div class="col">
@@ -54,8 +44,10 @@
     <div class="col">
         <div class="card">
             <div class="card-header card-header-primary">
-                <h4 class="card-title"> {{ question.question_title }} </h4>
-                <!--<h4 class="card-title"> {{ question.question_text|safe }}</h4>-->
+                <center>
+                <h4 class="card-title"> {{ question.question_text|safe }}</h4>
+                {% include "includes/question_history.html" with question=question question_history=question_history %}
+                </center>
             </div>
             <div class="card-body">
                 <form action="{% url 'base:save_answer' assessment.id question.id %}" method="post">
@@ -63,9 +55,6 @@
                     <!--{% if error %}
                         <span class="text-danger">{{ error }}</span>
                     {% endif %}-->
-                    <center>
-                        <p><h4 style="color: black"><i>{{ question.question_text|safe }}</i></h4></p>
-                    </center>
                     {% if answer.answer_content %}
                         <textarea class="form-control rounded px-1" name="answer_content" rows="15" style="background-color: #E8E8E8" placeholder="Vul hier uw antwoord in"> {{ answer.answer_content }} </textarea>
                     {% else %}
@@ -79,12 +68,17 @@
                         </div>
                     </div>
                     <div class="text-center">
-                        <button class="btn btn-secundary" style="padding-left:5em;padding-right:5em;" type="button" data-bs-toggle="collapse" data-bs-target="#question_context">Klik hier voor vraag context en uitleg</button>
+                        <button class="btn btn-secundary" style="padding-left:5em;padding-right:5em;" type="button" data-bs-toggle="collapse" data-bs-target="#question_context">Vraag instructies, context en uitleg</button>
                     </div>
                     <div class="collapse border rounded" id="question_context" style="border-color: grey; background-color: #F5F5F5">
-                      <p style="margin: 1em; font-size: 17px"> {{ question.question_context|safe }} </p>
+                        <p style="margin: 1em; font-size:18px"><b>Instructies:</b></p>
+                        <p style="margin: 1em; font-size:17px"> {{ question.question_instruction|safe }} </p>
+                        {% if question.question_context %}
+                        <p style="margin: 1em; font-size:18px"><b>Context:</b></p>
+                        <p style="margin: 1em; font-size: 17px"> {{ question.question_context|safe }} </p>
+                        {% endif %}
                     </div>
-                    <p style="margin-top: 0.5em; font-size:17px"> {{ question.question_instruction|safe }} </p>
+                    
                     
                     <br>
                     {% if question.question_reference_text %}
