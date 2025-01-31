@@ -1,7 +1,7 @@
 import pdfkit
 from jinja2 import Environment, FileSystemLoader
 
-from base.models import Question, Answer, Law, Phase4Answer
+from base.models import Question, Answer
 
 # Crude solution but gets the job done
 def get_questions_by_phase(assessment):
@@ -41,48 +41,11 @@ def get_questions_by_phase(assessment):
 
     return questions_by_phase
 
-def get_laws(assessment):
-    # Get the necessary objects from the db
-    questions = Question.objects.filter(question_phase=4)
-    laws = Law.objects.filter(assessment=assessment)
-    
-    # Setup the list of dicts that represent all the law objects related to this assessment
-    law_list = []
-    
-    # Go through each law and construct the law object
-    for law in laws:
-        law_object = {
-            "name": law.name,
-            "phase4": []
-        }
-
-        # Append all the answers and question of phase4
-        for question in questions:
-            phase4_object = {
-                "question": question.question_text,
-            }
-            
-            # Either get the associated answer or alternative message
-            try:
-                phase4_object["answer"] = Phase4Answer.objects.filter(assessment_id=assessment, law=law, question_id=question).latest("created").answer_content
-            except (KeyError, Phase4Answer.DoesNotExist):
-                phase4_object["answer"] = "- Geen antwoord beschikbaar"
-            if phase4_object["answer"].strip() == "" : phase4_object["answer"] = "- Geen antwoord beschikbaar"
-
-            # Append the question/answer dict to the phase4 object list
-            law_object["phase4"].append(phase4_object)
-
-        # Append the law object to the list of law objects
-        law_list.append(law_object)
-
-    return law_list
-
 
 def produce_summary(assessment):
     # Get context objects for the template
     context = {
         "questions": get_questions_by_phase(assessment),
-        "laws": get_laws(assessment),
         "assessment_name": assessment.name,
         "ultimately_responsible": {
             "person": assessment.ultimately_responsible,

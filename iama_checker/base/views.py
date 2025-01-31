@@ -1,8 +1,8 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.template import ContextPopException
-from .forms import AssessmentForm, AnswerForm, CollaboratorForm, SearchEditorForm, LawForm
-from .models import Assessment, LawCluster, Phase4Answer, Question, Answer, Collaborator, Reference, Law
+from .forms import AssessmentForm, AnswerForm, CollaboratorForm, SearchEditorForm
+from .models import Assessment, LawCluster, Question, Answer, Collaborator, Reference
 from django.contrib.auth.models import User 
 from django.http import HttpResponseRedirect 
 from django.urls import reverse
@@ -151,7 +151,6 @@ def question_detail(request, assessment_id, question_id):
         # Phase 4 intro is special and needs to list all the laws that are endangered according to the assessment
         if question.question_phase == 4:
             # Gather additional context needed for fase 4
-            context["law_list"] = Law.objects.filter(assessment=assessment).order_by("name")
             context["jobs"] = jobs_per_phase(4)
             context["law_clusters"] = LawCluster.objects.all()
 
@@ -230,7 +229,6 @@ def save_answer(request, assessment_id, question_id):
                 answer.answer_content = answer_form.data["answer_content"].strip()# is_valid drops answer content from cleaned data?????
             
             #TODO: implement error for definitively saving empty answer:
-            #elif "reviewed" in request.POST and answer_form.data["answer_content"].strip() == "":
 
             # Check the state of the question
 
@@ -453,202 +451,3 @@ def delete_editor(request, assessment_id, editor_id):
 def landing_page(request):
     assessments_list = Assessment.objects.filter(user__pk=request.user.pk).order_by("-date_last_saved")
     return render(request, "base/landing_page.html", {"assessments_list": assessments_list})
-
-@login_required
-def create_law(request, assessment_id):
-    if request.method == "POST":
-        # Find the assessment
-        try:
-            assessment = Assessment.objects.get(pk=assessment_id)
-
-        except (KeyError, Assessment.DoesNotExist):
-            return render(request, "errors/error.html", {"message": "Assessment bestaat niet!"})
-        
-        if not user_has_edit_privilidge(request.user.pk, assessment):
-            return render(request, "errors/error.html", {"message": "Gebruiker heeft geen permissie om grondrechten toe te voegen!"})
-        
-        # Retrieve the post data and make it usable 
-        form = LawForm(request.POST)
-        next = request.POST.get("next", reverse("base:question_detail", args=(assessment.id, 10,)))
-
-        # Validate form data
-        if form.is_valid():
-            # Create the Law object
-            law = Law(name=form.cleaned_data["name"])
-            law.assessment = assessment
-            law.save()
-            generate_empty_law_answers(law)
-            return HttpResponseRedirect(next)
-
-        # Form error
-        else:
-            request.session["error"] = "Gebruiker heeft geen valide data ingevoerd!"
-            return HttpResponseRedirect(next)
-
-    else:
-        render(request, "errrors/error.html", {"message": "Alleen POST requests zijn toegestaan voor de actie!"})
-
-@login_required
-def delete_law(request, law_id):
-    if request.method == "GET":
-        # Get the law object
-        try:
-            law = Law.objects.get(pk=law_id)
-
-        except (KeyError, Law.DoesNotExist):
-            return render(request, "errors/error.html", {"message": "Grondrecht bestaat niet!"})
-
-        # Check user privilidges
-        if not user_has_edit_privilidge(request.user.pk, law.assessment):
-            return render(request, "errors/error.html", {"message": "Gebruiker heeft geen permissie om grondrechten te verwijderen!"})
-        
-        # Get the next address to go to after deletion
-        next = request.GET.get("next", reverse("base:question_detail", args=(law.assessment.id, 11,)))
-
-        # Delete law object
-        law.delete()
-        return HttpResponseRedirect(next)
-
-    else:
-        render(request, "errrors/error.html", {"message": "Alleen GET requests zijn toegestaan voor de actie!"})
-
-            
-@login_required
-def law_detail(request, law_id, law_question_id):
-    try:
-        law = Law.objects.get(pk=law_id)
-        question = Question.objects.get(pk=law_question_id) 
-
-    # No law object found in db
-    except (KeyError, Law.DoesNotExist):
-        return render(request, "errors/error.html", {"message": "Grondrecht bestaat niet!"})
-
-    # No question object found in db
-    except (KeyError, Question.DoesNotExist):
-        return render(request, "errors/error.html", {"message": "Grondrecht bestaat niet!"})
-
-    # Check user authority 
-    if not user_has_edit_privilidge(request.user.pk, law.assessment):
-        return render(request, "errors/error.html", {"message": "Gebruiker heeft geen toegang tot deze assessment!"})
-
-    # All the context send to the template goes in this dict
-    context = {}
-
-    # Id's of next and next questions
-    context["buttons"]= {
-        "next": question.id + 1,
-        "prev": question.id - 1
-    }
-
-    # Objects need te render the question index correctly
-    context["index_context_objects"] = {
-        "question_list": Question.objects.filter(question_phase=5).order_by("pk"),
-        "status_list": get_law_complete_status(request, law.assessment)
-    }
-
-    # Get context that helps display question information
-    context["assessment"] = law.assessment
-    context["law"] = law
-    context["question"] = question
-    context["reference_list"] = Reference.objects.filter(questions=question)
-    context["jobs"] = question.jobs_as_py_list()
-
-    # Get the newest answer
-    try:
-        answer = Phase4Answer.objects.filter(question_id=question, assessment_id=law.assessment, law=law).latest("created")
-    # Maybe remove this, don't know could break but there is definitely a better way to do this
-    except (KeyError, Phase4Answer.DoesNotExist):
-        answer = Phase4Answer(assessment_id=law.assessment, law=law, question_id=question, user=request.user, status=Answer.Status.UA)
-        answer.save()
-    context["answer"] = answer
-
-    # Context for the collaborators function
-    context["collab_list"] = Collaborator.objects.filter(answers=answer)
-    context["collab_options"] = get_collab_options(law.assessment, answer)
-
-    # Context for the question history
-    context["question_history"] = get_answers_sorted(law.assessment, question)
-
-    # Check if fase 4 can be cut off due to finding limiting legislation, this is assessed in qustion 4.1
-    if question.question_number == 1:
-        context["cut_off"] = True
-    
-    # Make sure the appendix containing the risk image appears in question 4.2
-    elif question.question_number == 2:
-        context["risk_appendix"] = True
-
-    # Add appendix containing mitigating measures to question 4.6
-    elif question.question_number == 6:
-        context["measure_appendix"] = True
-
-    return render(request, "base/law_detail.html", context)
-    
-@login_required
-def save_law_answer(request, law_id, law_question_id):
-    if request.method == "POST":
-        try:
-            law = Law.objects.get(pk=law_id)
-            answer = Phase4Answer.objects.filter(law=law, question_id=law_question_id).latest("created")
-            question = Question.objects.get(pk=law_question_id)
-
-        except (KeyError, Answer.DoesNotExist):
-            return render(request, "errors/error.html", {"message": "Opgeslagen antwoord is niet gevonden in de db!"})
-        
-        except (KeyError, Law.DoesNotExist):
-            return render(request, "errors/error.html", {"message": "Assessment kan niet gevond worden!"})
-
-
-        # Check if user is autorised
-        if not user_has_edit_privilidge(request.user.pk, law.assessment):
-            return render(request, "errors/error.html", {"message": "Gebruiker heeft geen toegang tot deze assessment!"})
-        
-        # Put the POST request data into form
-        answer_form = AnswerForm(request.POST)
-
-        # Make sure the data is valid
-        if answer_form.is_valid():
-
-            # Only create a new answer if the answers content has been updated
-            if answer_form.data["answer_content"].strip() != answer.answer_content:
-                answer = Phase4Answer(assessment_id=law.assessment, user=request.user, question_id=question, law=law)
-
-                # Update answer data
-                answer.answer_content = answer_form.data["answer_content"].strip()# is_valid drops answer content from cleaned data?????
-
-            # Unanswered
-            if answer.answer_content == "":# is_valid drops answer content from cleaned data?????
-                answer.status = Answer.Status.UA
-
-            # Reviewed
-            elif answer_form.cleaned_data["reviewed"]:
-                answer.status = Answer.Status.RV
-
-            # Answered
-            else:
-                answer.status = Answer.Status.AW
-
-            answer.save()
-
-
-            # Check if the law is limiting, this can only be checked at question 4.1
-            if question.question_number == 1: 
-                if answer_form.cleaned_data["cut_off"]:
-                    law.status = Law.Status.CO
-                else:
-                    # Determine if the law is complete if t
-                    law.status = is_law_complete(law)
-            # Only on question 1 can the cut off be determined, but answering another question shouldn't undo the cut-off setting
-            elif law.status != Law.Status.CO:
-                # Determine if the law is complete if t
-                law.status = is_law_complete(law)
-
-            law.save()
-
-            # Check the completion status of the law answering
-            
-            # Return to question detail page with updated answer
-            return HttpResponseRedirect(reverse("base:law_detail", args=(law_id, law_question_id,)))
-
-        # Error
-        else:
-            return render(request, "errors/error.html", {"message": "Voer valide data in!"})
