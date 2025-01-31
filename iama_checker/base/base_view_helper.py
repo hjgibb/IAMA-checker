@@ -1,5 +1,5 @@
 # File with the helpler functions for the base views
-from .models import Assessment, Phase4Answer, Question, Answer, Law
+from .models import Assessment, Question, Answer
 
 def get_answers_sorted(assessment, question):
     return_list = Answer.objects.filter(assessment_id=assessment, question_id=question).order_by("-created")
@@ -16,14 +16,9 @@ def user_has_edit_privilidge(user_id, assessment):
 # Return true if all answers have the reviewed status
 def all_answers_reviewed(assessment_id):
     # Loop through all questions
-    for question in Question.objects.exclude(question_phase=5):
+    for question in Question.objects.all():
         # Make sure to only check questions and not phase intros, then check only if the latest element is not reviewed
         if question.question_number != 0 and Answer.objects.filter(assessment_id=assessment_id, question_id=question).latest("created").status != Answer.Status.RV:
-            return False
-
-    # Check if laws are completed
-    for law in Law.objects.filter(assessment_id=assessment_id):
-        if law.status == Law.Status.ICP:
             return False
     # All answer have reviewed status
     return True
@@ -45,18 +40,11 @@ def jobs_per_phase(phase_num):
 # Generates emtpy answers for all of questions in the assessment
 def generate_empty_answers(assessment, user):
     # Go through all the questions
-    for question in Question.objects.exclude(question_phase=5):
+    for question in Question.objects.all():
         # Only create answers for question and not phase introductions 
         if question.question_number != 0:
             # Create an empty answer and store it in the db
             answer = Answer(assessment_id=assessment, question_id=question, user=user, status=Answer.Status.UA)
-            answer.save()
-
-# Generate empty answers for a law in phase phase 4
-def generate_empty_law_answers(law):
-    for question in Question.objects.filter(question_phase=5):
-        if question.question_number != 0:
-            answer = Phase4Answer(law=law, assessment_id=law.assessment, question_id=question, user=law.assessment.user, status=Answer.Status.UA) 
             answer.save()
 
 # Retrieve a list of options to add as possible collaborators to an answer
@@ -79,7 +67,7 @@ def get_collab_options(assessment, curr_answer):
 # Retrieves the completion status as html of every answer related to an assessment
 # and puts them in a dictionary that is returned
 def get_complete_status(request, assessment):
-    question_list = Question.objects.exclude(question_phase=5)
+    question_list = Question.objects.all()
     status_list = {}
     for question in question_list:
         try:
@@ -102,41 +90,5 @@ def get_complete_status(request, assessment):
             status = "<span class='badge badge-danger badge-pill'>Nog beantwoorden</span>"
         # Append dict
         status_list[str(question.id)] = status
-
-    return status_list
-
-# Return the law complete or incomplete status based on wether the phase 4 questions of that law were reviewed
-def is_law_complete(law):
-    # Loop through all questions of phase 4, remember that the question are have 
-    for question in Question.objects.filter(question_phase=5):
-        # Make sure to only check questions and not phase intros, then check only if the latest element is not reviewed
-        if question.question_number != 0 and Phase4Answer.objects.filter(law=law, assessment_id=law.assessment, question_id=question).latest("created").status != Answer.Status.RV:
-            return Law.Status.ICP
-    # All answer have reviewed status
-    return Law.Status.CP
-
-# Get the completion status of all the questions for a given law
-def get_law_complete_status(request, assessment):
-    questions = Question.objects.filter(question_phase=5)
-    status_list = {}
-    for question in questions:
-        try:
-            # Match an answer based on question_id, user_id and assessment_id
-            answer = Phase4Answer.objects.filter(question_id=question, assessment_id=assessment).latest("created")
-
-            # Have the html stored in a string-variable to reduce html clutter in the question_index.html file
-            match answer.status:
-                case Answer.Status.UA:
-                    status_list[str(question.id)] = "<span class='badge badge-danger badge-pill'>Onbeantwoord</span>"
-                
-                case Answer.Status.AW:
-                    status_list[str(question.id)] = "<span class='badge badge-warning badge-pill'>Beantwoord</span>"
-
-                case Answer.Status.RV:
-                    status_list[str(question.id)] = "<span class='badge badge-success badge-pill'>Reviewed</span>"
-
-        # Answers are created when the related question_page is first visited so, missing object also means unanswered 
-        except (KeyError, Answer.DoesNotExist):
-            status_list[str(question.id)] = "<span class='badge badge-danger badge-pill'>Onbeantwoord</span>"
 
     return status_list
