@@ -104,7 +104,7 @@ def detail(request, assessment_id):
     return render(request, "base/detail.html", {"assessment": assessment, "index_context_objects": index_context_objects})
 
 # Retrieves the details of a question or phase introduction
-# TODO: At some point fix this clusterfuck of a function
+# TODO: At some point restructure this function
 @login_required
 def question_detail(request, assessment_id, question_id):
     # Get the desired question and assessment
@@ -145,8 +145,6 @@ def question_detail(request, assessment_id, question_id):
             "buttons": buttons,
             "jobs": jobs_per_phase(question.question_phase),
         }
-
-        #TODO: clean up "phase 5" elements that are no longer used
 
         # Phase 4 intro is special and needs to list all the laws that are endangered according to the assessment
         if question.question_phase == 4:
