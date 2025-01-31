@@ -92,7 +92,6 @@ class Answer(models.Model):
     # For tracking answer history
     created = models.DateTimeField(auto_now_add=True, blank=True)
 
-#TODO: restructure so phase 4 is no longer per law and remove cut-off property
 
 # Could also have a relation to Assessment, but would be redundant info since the answer is already related
 # Don't know what is best practice here, so could be revisited later.
